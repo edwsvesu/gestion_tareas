@@ -23,7 +23,6 @@ class TareaController extends AbstractController
             ->leftJoin('t.categorias', 'c')
             ->addSelect('u', 'c');
 
-        // Filtros
         if ($estado = $request->query->get('estado')) {
             $qb->andWhere('t.estado = :estado')->setParameter('estado', $estado);
         }
@@ -35,7 +34,7 @@ class TareaController extends AbstractController
         }
         if ($search = $request->query->get('search')) {
             $qb->andWhere('t.titulo LIKE :search OR t.descripcion LIKE :search')
-               ->setParameter('search', '%' . $search . '%');
+                ->setParameter('search', '%' . $search . '%');
         }
         if ($fechaInicio = $request->query->get('fecha_inicio')) {
             $qb->andWhere('t.fechaCreacion >= :fechaInicio')->setParameter('fechaInicio', new \DateTime($fechaInicio));
@@ -44,7 +43,6 @@ class TareaController extends AbstractController
             $qb->andWhere('t.fechaCreacion <= :fechaFin')->setParameter('fechaFin', new \DateTime($fechaFin . ' 23:59:59'));
         }
 
-        // Ordenamiento
         $sortBy = $request->query->get('sort_by', 'fechaCreacion');
         $sortOrder = strtoupper($request->query->get('sort_order', 'DESC'));
         if (in_array($sortBy, ['fechaCreacion', 'fechaVencimiento', 'prioridad', 'estado', 'titulo'])) {
@@ -90,14 +88,12 @@ class TareaController extends AbstractController
             }
         }
 
-        // Asignar usuario (por defecto el logueado, o el que se envíe si es admin)
         $usuario = $this->getUser();
         if (!empty($data['usuario_id']) && $this->isGranted('ROLE_ADMIN')) {
             $usuario = $em->getRepository(Usuario::class)->find($data['usuario_id']);
         }
         $tarea->setUsuario($usuario);
 
-        // Categorias
         if (!empty($data['categorias']) && is_array($data['categorias'])) {
             foreach ($data['categorias'] as $catId) {
                 $categoria = $em->getRepository(Categoria::class)->find($catId);
@@ -139,7 +135,6 @@ class TareaController extends AbstractController
         }
 
         if (isset($data['categorias']) && is_array($data['categorias'])) {
-            // Limpiar categorias actuales
             foreach ($tarea->getCategorias() as $cat) {
                 $tarea->removeCategoria($cat);
             }

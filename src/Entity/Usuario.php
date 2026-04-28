@@ -167,7 +167,6 @@ class Usuario implements UserInterface, PasswordAuthenticatedUserInterface
     public function removeTarea(Tarea $tarea): static
     {
         if ($this->tareas->removeElement($tarea)) {
-            // set the owning side to null (unless already changed)
             if ($tarea->getUsuario() === $this) {
                 $tarea->setUsuario(null);
             }

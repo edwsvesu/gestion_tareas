@@ -61,7 +61,6 @@ const handleRegister = async () => {
   success.value = '';
   
   try {
-    // Usamos api para aprovechar la base URL en caso necesario, o axios directo
     await api.post('/register', {
       email: email.value,
       password: password.value
@@ -69,7 +68,6 @@ const handleRegister = async () => {
     
     success.value = 'Registro exitoso. Redirigiendo al login...';
     
-    // Redirigir al login después de 1.5 segundos
     setTimeout(() => {
       router.push({ name: 'Login' });
     }, 1500);

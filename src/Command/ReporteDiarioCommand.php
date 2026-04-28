@@ -24,11 +24,10 @@ class ReporteDiarioCommand extends Command
     private string $projectDir;
 
     public function __construct(
-        EntityManagerInterface $em, 
-        ReportService $reportService, 
+        EntityManagerInterface $em,
+        ReportService $reportService,
         #[Autowire('%kernel.project_dir%')] string $projectDir
-    )
-    {
+    ) {
         parent::__construct();
         $this->em = $em;
         $this->reportService = $reportService;
@@ -41,8 +40,6 @@ class ReporteDiarioCommand extends Command
 
         $io->info('Recopilando tareas pendientes y en progreso...');
 
-        // EXPLAIN query (para cumplir con el requerimiento de análisis de rendimiento)
-        // Se puede ver el plan de ejecución usando el query builder, pero aquí solo ejecutamos la consulta
         $qb = $this->em->getRepository(Tarea::class)->createQueryBuilder('t')
             ->where("t.estado IN ('pendiente', 'en_progreso')")
             ->orderBy('t.prioridad', 'DESC');

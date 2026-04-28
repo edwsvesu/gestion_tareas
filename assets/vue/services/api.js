@@ -8,7 +8,6 @@ const api = axios.create({
     }
 });
 
-// Request Interceptor: Añadir JWT a las peticiones
 api.interceptors.request.use((config) => {
     const token = localStorage.getItem('jwt_token');
     if (token) {
@@ -17,12 +16,10 @@ api.interceptors.request.use((config) => {
     return config;
 });
 
-// Response Interceptor: Manejar expiración del JWT
 api.interceptors.response.use(
     (response) => response,
     async (error) => {
         if (error.response && error.response.status === 401) {
-            // Token expirado o inválido
             localStorage.removeItem('jwt_token');
             router.push({ name: 'Login' });
         }
