@@ -33,7 +33,6 @@ const router = createRouter({
     routes
 });
 
-// Navigation Guard
 router.beforeEach((to, from, next) => {
     const token = localStorage.getItem('jwt_token');
 

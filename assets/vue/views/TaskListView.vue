@@ -15,7 +15,6 @@
       </div>
     </div>
 
-    <!-- Formulario Nueva Tarea -->
     <div v-if="showForm" class="task-form-card">
       <h3 class="form-title">{{ form.id ? 'Editar Tarea' : 'Nueva Tarea' }}</h3>
       <form @submit.prevent="saveTask" class="form-grid">
@@ -62,7 +61,6 @@
       </form>
     </div>
 
-    <!-- Filtros y Búsqueda -->
     <div class="filters-container">
       <div class="search-wrapper">
         <span class="search-icon">🔍</span>
@@ -117,7 +115,6 @@
       </div>
     </div>
 
-    <!-- Listado -->
     <div v-if="loading && tasks.length === 0" class="loading-state">
       Cargando tareas...
     </div>
@@ -315,7 +312,6 @@ const downloadReport = async (format) => {
       responseType: 'blob'
     });
     
-    // Crear enlace temporal para forzar descarga
     const url = window.URL.createObjectURL(new Blob([response.data]));
     const link = document.createElement('a');
     link.href = url;

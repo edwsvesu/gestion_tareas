@@ -30,13 +30,9 @@ Este proyecto es una aplicación web híbrida desarrollada en **Symfony 7.2** (B
 3. **Configurar Entorno:**
    - Copiar `.env` a `.env.local` y configurar tu conexión a la base de datos MySQL en `DATABASE_URL`.
    - Ejemplo: `DATABASE_URL="mysql://root:@127.0.0.1:3306/gestion_tareas"`
+   - Nota: La clave secreta de JWT ya está configurada en la variable `JWT_SECRET_KEY` del archivo `.env` mediante encriptación simétrica (HS256), por lo que no es necesario generar llaves `.pem`.
 
-4. **Generar las llaves JWT (Si no existen):**
-   ```bash
-   php bin/console lexik:jwt:generate-keypair
-   ```
-
-5. **Preparar Base de Datos y Fixtures:**
+4. **Preparar Base de Datos y Fixtures:**
    - Se han incluido **Data Fixtures** para facilitar la evaluación. Este comando creará la base de datos, ejecutará las migraciones y cargará usuarios, categorías y tareas de prueba automáticamente.
    ```bash
    php bin/console doctrine:database:create --if-not-exists
@@ -48,7 +44,7 @@ Este proyecto es una aplicación web híbrida desarrollada en **Symfony 7.2** (B
    - Email: `admin@test.com` | Password: `admin123`
    - Email: `usuario1@test.com` | Password: `user123`
 
-6. **Compilar Frontend y Levantar Servidor:**
+5. **Compilar Frontend y Levantar Servidor:**
    ```bash
    npm run build
    php bin/console server:run # o symfony server:start
