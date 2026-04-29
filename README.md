@@ -15,8 +15,7 @@ Autor: Edwin Sneider Velandia Suarez
 ### 1. Clonar el repositorio
 
 ```bash
-git clone <url-del-repositorio>
-cd gestion_tareas
+git clone https://github.com/edwsvesu/prueba_gestion_tareas
 ```
 
 ### 2. Instalar dependencias PHP
@@ -78,7 +77,7 @@ symfony server:start
 ## Capturas de pantalla
 
 ### Pantalla de login
-> _(agregar captura)_
+![Login](capturas_pantalla/login.png)
 
 ### Dashboard de tareas con filtros activos
 > _(agregar captura)_
@@ -103,22 +102,22 @@ Authorization: Bearer <jwt_token>
 
 ### Autenticación
 
-| Método | Endpoint | Descripción | Auth |
-|--------|----------|-------------|------|
-| POST | `/api/login_check` | Obtener JWT + refresh token | Pública |
-| POST | `/api/register` | Registrar nuevo usuario | Pública |
-| POST | `/auth/refresh` | Renovar JWT con refresh token | Pública |
-| POST | `/api/forgot-password` | Solicitar recuperación de contraseña | Pública |
-| POST | `/api/reset-password` | Confirmar nueva contraseña con token | Pública |
+| Método | Endpoint | Descripción |
+|--------|----------|-------------|
+| POST | `/api/login_check` | Obtener JWT + refresh token |
+| POST | `/api/register` | Registrar nuevo usuario |
+| POST | `/auth/refresh` | Renovar JWT con refresh token |
+| POST | `/api/forgot-password` | Solicitar recuperación de contraseña |
+| POST | `/api/reset-password` | Confirmar nueva contraseña con token |
 
 ### Tareas
 
 | Método | Endpoint | Descripción | Rol |
 |--------|----------|-------------|-----|
-| GET | `/api/tareas` | Listar tareas con filtros | USER |
-| GET | `/api/tareas/{id}` | Detalle de una tarea | USER |
-| POST | `/api/tareas` | Crear tarea | USER |
-| PUT/PATCH | `/api/tareas/{id}` | Editar tarea | USER |
+| GET | `/api/tareas` | Listar tareas con filtros | TODOS |
+| GET | `/api/tareas/{id}` | Detalle de una tarea | TODOS |
+| POST | `/api/tareas` | Crear tarea | TODOS |
+| PUT/PATCH | `/api/tareas/{id}` | Editar tarea | TODOS |
 | DELETE | `/api/tareas/{id}` | Eliminar tarea | ADMIN |
 
 **Filtros disponibles en `GET /api/tareas`:**
@@ -191,10 +190,9 @@ ORDER BY t.fecha_creacion DESC;
 Para el volumen de datos de esta aplicación, el rendimiento actual es aceptable. Si una base de datos como esta crece, propongo estos indices adicionales:
 
 ```sql
--- Índice recomendado para entornos de producción con alta carga
 CREATE INDEX idx_tarea_estado ON tarea (estado);
 
--- Índice compuesto recomendado si el filtro más común es estado + fecha
+-- Índice compuesto si el filtro más común es estado + fecha
 CREATE INDEX idx_tarea_estado_fecha ON tarea (estado, fecha_creacion);
 ```
 
