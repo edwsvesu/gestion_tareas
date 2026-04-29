@@ -18,38 +18,7 @@ class TareaController extends AbstractController
     #[Route('', name: 'index', methods: ['GET'])]
     public function index(Request $request, EntityManagerInterface $em): JsonResponse
     {
-        $qb = $em->getRepository(Tarea::class)->createQueryBuilder('t')
-            ->leftJoin('t.usuario', 'u')
-            ->leftJoin('t.categorias', 'c')
-            ->addSelect('u', 'c');
-
-        if ($estado = $request->query->get('estado')) {
-            $qb->andWhere('t.estado = :estado')->setParameter('estado', $estado);
-        }
-        if ($prioridad = $request->query->get('prioridad')) {
-            $qb->andWhere('t.prioridad = :prioridad')->setParameter('prioridad', $prioridad);
-        }
-        if ($usuarioId = $request->query->get('usuario_id')) {
-            $qb->andWhere('u.id = :usuarioId')->setParameter('usuarioId', $usuarioId);
-        }
-        if ($search = $request->query->get('search')) {
-            $qb->andWhere('t.titulo LIKE :search OR t.descripcion LIKE :search')
-                ->setParameter('search', '%' . $search . '%');
-        }
-        if ($fechaInicio = $request->query->get('fecha_inicio')) {
-            $qb->andWhere('t.fechaCreacion >= :fechaInicio')->setParameter('fechaInicio', new \DateTime($fechaInicio));
-        }
-        if ($fechaFin = $request->query->get('fecha_fin')) {
-            $qb->andWhere('t.fechaCreacion <= :fechaFin')->setParameter('fechaFin', new \DateTime($fechaFin . ' 23:59:59'));
-        }
-
-        $sortBy = $request->query->get('sort_by', 'fechaCreacion');
-        $sortOrder = strtoupper($request->query->get('sort_order', 'DESC'));
-        if (in_array($sortBy, ['fechaCreacion', 'fechaVencimiento', 'prioridad', 'estado', 'titulo'])) {
-            $qb->orderBy('t.' . $sortBy, in_array($sortOrder, ['ASC', 'DESC']) ? $sortOrder : 'DESC');
-        }
-
-        $tareas = $qb->getQuery()->getResult();
+        $tareas = $em->getRepository(Tarea::class)->findTareasByFilters($request->query->all());
 
         $data = [];
         foreach ($tareas as $tarea) {
