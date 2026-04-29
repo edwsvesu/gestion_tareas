@@ -27,7 +27,6 @@ class AuthController extends AbstractController
             return $this->json(['error' => 'Datos inválidos. Se requiere email y password.'], 400);
         }
 
-        // Verificar si el email ya existe
         $existingUser = $entityManager->getRepository(Usuario::class)->findOneBy(['email' => $data['email']]);
         if ($existingUser) {
             return $this->json(['error' => 'El correo electrónico ya está en uso.'], 400);
@@ -36,7 +35,7 @@ class AuthController extends AbstractController
         $user = new Usuario();
         $user->setEmail($data['email']);
         $user->setRoles(['ROLE_USER']);
-        
+
         $hashedPassword = $passwordHasher->hashPassword($user, $data['password']);
         $user->setPassword($hashedPassword);
 

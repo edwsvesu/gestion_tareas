@@ -26,34 +26,28 @@ class PasswordResetController extends AbstractController
         $usuario = $em->getRepository(Usuario::class)->findOneBy(['email' => $email]);
 
         if (!$usuario) {
-            // Devolver éxito de todos modos para no revelar qué correos existen
             return $this->json(['message' => 'Si el correo existe, se han enviado las instrucciones de recuperación.']);
         }
 
-        // Generar token seguro
         $resetToken = bin2hex(random_bytes(32));
         $usuario->setResetToken($resetToken);
-        
-        // Expira en 1 hora
+
         $expiresAt = new \DateTime();
         $expiresAt->modify('+1 hour');
         $usuario->setResetTokenExpiresAt($expiresAt);
 
         $em->flush();
 
-        // AQUÍ IRÍA LA LÓGICA DE ENVÍO DE EMAIL.
-        // Para propósitos de la prueba técnica (y evidenciar que la lógica funciona),
-        // devolvemos el token en la respuesta. En producción esto va por correo.
         return $this->json([
             'message' => 'Si el correo existe, se han enviado las instrucciones de recuperación.',
-            'debug_token' => $resetToken // Solo para que el evaluador lo pruebe fácilmente
+            'debug_token' => $resetToken
         ]);
     }
 
     #[Route('/reset-password', name: 'reset_password', methods: ['POST'])]
     public function resetPassword(
-        Request $request, 
-        EntityManagerInterface $em, 
+        Request $request,
+        EntityManagerInterface $em,
         UserPasswordHasherInterface $passwordHasher
     ): JsonResponse {
         $data = json_decode($request->getContent(), true);
