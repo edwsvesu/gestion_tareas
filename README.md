@@ -1,28 +1,12 @@
-# Sistema de Gestión de Tareas
+# PRUEBA TECNICA FULLSTACK: Sistema de Gestión de Tareas
 
-Aplicación web desarrollada con **Symfony 7.2**, **PHP 8.2+** y **Vue 3** como parte de una prueba técnica. Implementa un sistema CRUD de tareas con autenticación JWT, control de acceso por roles, generación de reportes y una interfaz reactiva en el cliente.
-
-## Stack tecnológico
-
-| Capa | Tecnología |
-|------|-----------|
-| Backend | Symfony 7.2 / PHP 8.2+ |
-| ORM | Doctrine ORM 3 + Migrations |
-| Autenticación | LexikJWT + GesdinetRefreshToken |
-| Base de datos | MySQL 8 |
-| Frontend | Vue 3 + Vue Router + Axios |
-| Bundler | Webpack Encore |
-| Reportes PDF | DomPDF |
-
----
+Autor: Edwin Sneider Velandia Suarez
 
 ## Requisitos previos
 
-- PHP 8.2 o superior con extensiones: `pdo_mysql`, `ctype`, `iconv`
-- Composer
+- PHP 8.3
 - Node.js 18+ y npm
 - MySQL 8
-- Symfony CLI (opcional, para el servidor de desarrollo)
 
 ---
 
@@ -49,13 +33,13 @@ npm install
 
 ### 4. Configurar el entorno
 
-Crear el archivo `.env.local` y definir la conexión a la base de datos:
+Se sugiere usar la siguiente conexión en el archivo de configuración de entorno
 
 ```dotenv
-DATABASE_URL="mysql://usuario:contraseña@127.0.0.1:3306/gestion_tareas?serverVersion=8.0.32&charset=utf8mb4"
+DATABASE_URL="mysql://root:@127.0.0.1:3306/gestion_tareas?serverVersion=8.0.32&charset=utf8mb4"
 ```
 
-> La clave JWT ya está preconfigurada en el `.env` para facilitar la evaluación.
+La clave JWT ya está preconfigurada en el `.env`.
 
 ### 5. Crear la base de datos y ejecutar migraciones
 
@@ -64,24 +48,18 @@ php bin/console doctrine:database:create
 php bin/console doctrine:migrations:migrate --no-interaction
 ```
 
-Esto ejecutará las dos migraciones en orden:
-- `Version20260427031324` — tablas principales (`usuario`, `tarea`, `categoria`, `messenger_messages`)
-- `Version20260429000000` — tabla `refresh_tokens` y campos de recuperación de contraseña en `usuario`
-
 ### 6. Cargar datos de prueba
+
+Se crean datos de ejemplo para facilitar pruebas: usuarios con dos perfiles (admin y usuario regular) y categorias de ejemplo.
 
 ```bash
 php bin/console doctrine:fixtures:load --no-interaction
 ```
 
-Esto crea usuarios, categorías y tareas de ejemplo listos para usar.
-
 **Credenciales de acceso tras los fixtures:**
 
-| Email | Contraseña | Rol |
-|-------|-----------|-----|
-| `admin@test.com` | `admin123` | ROLE_ADMIN |
-| `user@test.com` | `user123` | ROLE_USER |
+- usuarioadmin@gmail.com - clave 123456 - admin
+- usuario1@gmail.com@gmail.com - clave 123456 - regular
 
 ### 7. Compilar el frontend
 
@@ -93,11 +71,7 @@ npm run dev
 
 ```bash
 symfony server:start
-# o alternativamente:
-php -S localhost:8000 -t public/
 ```
-
-La aplicación estará disponible en `http://localhost:8000`.
 
 ---
 
@@ -158,12 +132,6 @@ Authorization: Bearer <jwt_token>
 ?sort_by=fechaCreacion&sort_order=DESC
 ```
 
-### Categorías
-
-| Método | Endpoint | Descripción |
-|--------|----------|-------------|
-| GET | `/api/categorias` | Listar todas las categorías |
-
 ### Reportes
 
 | Método | Endpoint | Descripción |
@@ -171,7 +139,7 @@ Authorization: Bearer <jwt_token>
 | GET | `/api/reportes/tareas?formato=pdf` | Reporte PDF personalizable |
 | GET | `/api/reportes/tareas?formato=csv` | Reporte CSV personalizable |
 
-Los reportes aceptan los mismos filtros que el listado de tareas (`estado`, `prioridad`, `usuario_id`, `fecha_inicio`, `fecha_fin`).
+Los reportes aceptan los mismos filtros que el listado de tareas
 
 ---
 
@@ -183,13 +151,7 @@ El sistema incluye un comando de Symfony para generar el reporte diario de tarea
 php bin/console app:reporte-diario
 ```
 
-El archivo PDF se guarda automáticamente en `var/reportes/reporte_diario_YYYY-MM-DD.pdf`.
-
-Para automatizarlo en producción, agregar al crontab:
-
-```cron
-0 7 * * * /usr/bin/php /ruta/del/proyecto/bin/console app:reporte-diario
-```
+El archivo PDF se guarda automáticamente en `var/reportes/...`.
 
 ---
 
@@ -221,11 +183,12 @@ ORDER BY t.fecha_creacion DESC;
 | 1 | SIMPLE | tc | ref | PRIMARY, IDX_tarea_id | IDX_tarea_id | 4 | t.id | 1 | Using index |
 | 1 | SIMPLE | c | eq_ref | PRIMARY | PRIMARY | 4 | tc.categoria_id | 1 | — |
 
-**Observaciones y decisión de diseño:**
 
 - Los joins a `usuario` y `categoria` utilizan sus claves primarias (`eq_ref`), lo cual es óptimo.
-- La tabla `tarea_categoria` aprovecha el índice `IDX_5124921E6D5BDFE1` generado por Doctrine sobre `tarea_id`.
-- El filtro por `estado` realiza un full scan (`ALL`) porque la columna no tiene índice propio. En un entorno con alta carga, añadir este índice sería la primera optimización:
+- La tabla `tarea_categoria` aprovecha el índice generado sobre `tarea_id`.
+- El filtro por `estado` realiza un full scan (`ALL`) porque la columna no tiene índice propio.
+
+Para el volumen de datos de esta aplicación, el rendimiento actual es aceptable. Si una base de datos como esta crece, propongo estos indices adicionales:
 
 ```sql
 -- Índice recomendado para entornos de producción con alta carga
@@ -235,57 +198,11 @@ CREATE INDEX idx_tarea_estado ON tarea (estado);
 CREATE INDEX idx_tarea_estado_fecha ON tarea (estado, fecha_creacion);
 ```
 
-- El `Using filesort` en el `ORDER BY fecha_creacion` desaparecería al agregar el índice compuesto anterior, ya que MySQL podría usar el índice tanto para filtrar como para ordenar en una sola pasada.
-
-> **Nota:** Para el volumen de datos de esta aplicación (decenas a cientos de tareas), el rendimiento actual es completamente adecuado. Los índices adicionales se justifican a partir de miles de registros o bajo carga concurrente alta.
-
----
-
-## Estructura del proyecto
-
-```
-src/
-├── Command/
-│   └── ReporteDiarioCommand.php    # Comando para reporte diario automático
-├── Controller/
-│   ├── AuthController.php          # Registro de usuarios
-│   ├── CategoriaController.php     # CRUD categorías
-│   ├── HomeController.php          # Sirve la SPA Vue
-│   ├── PasswordResetController.php # Recuperación de contraseña
-│   ├── ReporteController.php       # Exportación PDF/CSV
-│   ├── TareaController.php         # CRUD tareas con filtros
-│   └── UsuarioController.php       # Perfil del usuario
-├── Entity/
-│   ├── Categoria.php
-│   ├── RefreshToken.php
-│   ├── Tarea.php
-│   └── Usuario.php
-├── Repository/
-│   ├── TareaRepository.php         # findTareasByFilters() — consulta principal
-│   └── UsuarioRepository.php
-└── Service/
-    └── ReportService.php           # Generación de PDF y CSV
-
-assets/vue/
-├── views/
-│   ├── LoginView.vue
-│   ├── RegisterView.vue
-│   └── TaskListView.vue            # Dashboard principal con filtros
-├── router/index.js
-└── App.vue
-
-migrations/
-├── Version20260427031324.php       # Esquema base
-└── Version20260429000000.php       # refresh_tokens + campos reset_token
-```
-
 ---
 
 ## Recuperación de contraseña
 
-El flujo de recuperación de contraseña está implementado a nivel de API:
+El flujo de recuperación de contraseña está implementado a nivel de API, en producción el token se enviaría por email.
 
-1. `POST /api/forgot-password` con `{ "email": "..." }` — genera un token seguro de 256 bits y lo almacena con expiración de 1 hora. Siempre devuelve el mismo mensaje genérico para evitar user enumeration.
-2. `POST /api/reset-password` con `{ "token": "...", "password": "nueva" }` — valida el token, actualiza la contraseña con hash bcrypt e invalida el token para que no pueda reutilizarse.
-
-> En producción, el token se enviaría por email via `symfony/mailer`. Para esta evaluación, el token puede consultarse directamente en la columna `reset_token` de la tabla `usuario` y usarse en el endpoint de reset.
+1. `POST /api/forgot-password`
+2. `POST /api/reset-password`

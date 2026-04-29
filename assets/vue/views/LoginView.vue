@@ -10,7 +10,7 @@
             id="email" 
             v-model="email" 
             required 
-            placeholder="admin@test.com"
+            placeholder="usuarioadmin@gmail.com"
             class="form-control"
           />
         </div>
@@ -21,7 +21,7 @@
             id="password" 
             v-model="password" 
             required 
-            placeholder="admin123"
+            placeholder="123456"
             class="form-control"
           />
         </div>
