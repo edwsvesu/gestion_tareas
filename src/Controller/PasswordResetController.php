@@ -40,7 +40,6 @@ class PasswordResetController extends AbstractController
 
         return $this->json([
             'message' => 'Si el correo existe, se han enviado las instrucciones de recuperación.',
-            'debug_token' => $resetToken
         ]);
     }
 

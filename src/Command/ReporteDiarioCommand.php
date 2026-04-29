@@ -40,11 +40,10 @@ class ReporteDiarioCommand extends Command
 
         $io->info('Recopilando tareas pendientes y en progreso...');
 
-        $qb = $this->em->getRepository(Tarea::class)->createQueryBuilder('t')
-            ->where("t.estado IN ('pendiente', 'en_progreso')")
-            ->orderBy('t.prioridad', 'DESC');
-
-        $tareas = $qb->getQuery()->getResult();
+        $tareas = $this->em->getRepository(Tarea::class)->findBy(
+            ['estado' => ['pendiente', 'en_progreso']],
+            ['prioridad' => 'DESC']
+        );
 
         if (empty($tareas)) {
             $io->success('No hay tareas pendientes ni en progreso hoy. No se generará reporte.');
