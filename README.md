@@ -99,6 +99,8 @@ symfony server:start
 
 ![mobile](capturas_pantalla/mobil2.png)
 
+### Generación de reporte por comando
+![comando](capturas_pantalla/generacion_reporte.png)
 
 ---
 
