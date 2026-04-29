@@ -76,20 +76,29 @@ symfony server:start
 
 ## Capturas de pantalla
 
-### Pantalla de login
+### Pantalla de login/registro
 ![Login](capturas_pantalla/login.png)
 
 ### Dashboard de tareas con filtros activos
-> _(agregar captura)_
+![dashboard](capturas_pantalla/dashboard.png)
+
+![dashboard](capturas_pantalla/dashboard2.png)
+
 
 ### Panel de creación / edición de tarea
-> _(agregar captura)_
+![Creacion](capturas_pantalla/panel_creacion.png)
+
+![Edicion](capturas_pantalla/panel_edicion.png)
+
 
 ### Exportación de reporte en PDF
-> _(agregar captura)_
+![Reportes](capturas_pantalla/reportes.png)
 
 ### Vista mobile
-> _(agregar captura)_
+![mobile](capturas_pantalla/mobil.png)
+
+![mobile](capturas_pantalla/mobil2.png)
+
 
 ---
 
